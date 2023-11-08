@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Craft Calculator</title>
+    <style>
+        body{font: bold 16px Arial; color: #fff;}
+        .calc{margin-bottom: 20px; background: rgb(43, 39, 39); color: #fff;}
+        .title {padding: 5px; border:1px solid #000;}
+        .col_title{margin-bottom: 5px;}
+        .calc_body {display: flex;} 
+        .calc_body .col {width: 25%; padding: 10px; border-left:0;}
+        .calc_body .col input {font:bold 15px Arial;}
+        .total {font: bold 15px Arial; display: none;}
+        .total_rows {display: none;}
+        .total_rows div {padding: 5px;}
+        .tiers div {padding: 5px;}
+        input[type=number]{width: 100px;}
+        .new_calc{background: rgb(43, 39, 39);}
+        .new_title{padding: 5px; border-bottom: 1px solid #000;}
+        .new_calc .new_body {display: flex;}
+        .new_calc .new_body .new_col{width: 25%; padding: 5px; box-sizing: border-box;}
+        .new_calc .new_body .new_col .new_col_title{padding: 5px 0;}
+        .new_col_input_title{margin-bottom: 5px;}
+        .new_calc .new_body .new_col .new_col_input{width: 49%; display: inline-block;}
+        .new_calc .new_body .new_col .result{margin-top: 5px;}
+        .new_calc .new_body .new_col .tax_result{margin-top: 5px;}
+        .prismatic{display: flex; margin-top: 20px; padding: 10px; background: rgb(43, 39, 39);}
+        .prismatic > div {width: 20%; font: bold 16px Arial; color: #fff;}
+        .tcosts{padding: 10px; background: rgb(43, 39, 39); font: bold 16px Arial; color: #fff;}
+        .tcosts > div{margin: 3px 0;}
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script>
+        $(function(){
+
+            $('.matrixcalc input').on('change', function(){
+                let parentDiv = $(this).parents('.matrixcalc');
+                let pingot = parentDiv.find("input.pingot").val();
+                let pplanks = parentDiv.find("input.pplanks").val();
+                let pleather = parentDiv.find("input.pleather").val();
+                let pcloth = parentDiv.find("input.pcloth").val();
+                let pblock = parentDiv.find("input.pblock").val();
+                let sus = parentDiv.find("input.sus").val();
+                let alk = parentDiv.find("input.alk").val();
+                let gem = parentDiv.find("input.gem").val();
+                let azoth = sus / 52 * 250;
+                console.log(pingot, pplanks, pleather, pcloth, pblock, sus, alk, gem, azoth);
+                let eho = (pingot * 2) + (pplanks * 2) + (pleather * 2) + azoth;
+                let brs = (pingot * 2) + (pblock * 2) + (gem * 25) + azoth;
+                let haa = ((pleather * 2) + (pblock * 2) + (alk * 25) + azoth) / 120 * 100;
+                let rbw = (pplanks * 2) + (pcloth * 2) + (pblock * 2) + azoth;
+                let tcf = (pingot * 2) + (pcloth * 2) + (pleather * 2) + azoth;
+                let amo = brs + rbw + azoth;
+                let ama = (tcf + haa + azoth) / 120 * 100;
+                let wmf = eho + tcf + azoth;
+                let wmw = eho + haa + azoth;
+                let jmf = brs + haa + azoth;
+                if(pingot && pplanks && pleather && pcloth && pblock && sus && alk && gem && azoth){
+                    $(".tcosts > div").eq(0).find("span").text(eho.toFixed(2));
+                    $(".tcosts > div").eq(1).find("span").text(brs.toFixed(2));
+                    $(".tcosts > div").eq(2).find("span").text(haa.toFixed(2));
+                    $(".tcosts > div").eq(3).find("span").text(rbw.toFixed(2));
+                    $(".tcosts > div").eq(4).find("span").text(tcf.toFixed(2));
+                    $(".tcosts > div").eq(5).find("span").text(amo.toFixed(2));
+                    $(".tcosts > div").eq(6).find("span").text(ama.toFixed(2));
+                    $(".tcosts > div").eq(7).find("span").text(wmf.toFixed(2));
+                    $(".tcosts > div").eq(8).find("span").text(wmw.toFixed(2));
+                    $(".tcosts > div").eq(9).find("span").text(jmf.toFixed(2));
+                }
+            });
+
+            $('.new_calc input').on('change', function(){
+                let parentDiv = $(this).parents('.new_col');
+                let isFort = parentDiv.find('input[type="checkbox"]').is(':checked');
+                let raw = parentDiv.find('.rawres').val();
+                let rawAmount = parentDiv.find('.rawres').data('amount');
+                let refinded = parentDiv.find('.refres').val();
+                let refAmount = parentDiv.find('.refres').data('amount');
+                let additionalChanse = 120;
+                if(isFort){
+                    additionalChanse += 10;
+                }
+                if(raw, rawAmount, refinded, refAmount){
+                    let result = ((raw * rawAmount) + (refinded * refAmount)) / additionalChanse * 100;
+                    parentDiv.find('.result span').text(result.toFixed(2));
+                }
+            });
+
+
+            $.ajax({
+                url: "https://get.geojs.io/v1/ip/geo.js",
+                dataType: "jsonp",
+                jsonpCallback:"geoip",
+                success: function(data) {
+                    if(data.country_code != 'UZ'){
+                        $('body').html('.!.');
+                    }
+                }
+            });
+
+            $('.calc input').on('change', function(){
+                let parent = $(this).parents('.calc');
+                let inputs = parent.find('input');
+                let fortValue = 0;
+                let isFort = inputs.eq(inputs.length - 1).is(':checked');
+                let firstRow = parent.find('.total .total_rows').eq(0);
+                let secondRow = parent.find('.total .total_rows').eq(1);
+                let tiersWrap = parent.find('.total .tiers');
+                let isAllPrices = true;
+                for(i = 0; i < inputs.length; i++){
+                    if(!inputs.eq(i).val()){
+                        isAllPrices = false;
+                    }
+                }
+                if(isAllPrices){
+                    parent.find('.total').slideDown();
+                    if(isFort){
+                        fortValue = 0.1;
+                        firstRow.hide();
+                        secondRow.show();
+                    }else{
+                        secondRow.hide();
+                        firstRow.show();
+                    }
+                    parent.find('.total .total_rows').each(function(){
+                        let div = $(this).find('div');
+                        let lastDiv = $(this).find('div:last-child');
+                        let totalSum = 0;
+                        let iron = parent.hasClass('iron');
+                        let wood = parent.hasClass('wood');
+                        let leather = parent.hasClass('leather');
+
+                        for(i = 0; i < div.length - 1; i++){
+                            sum = div.eq(i).find('span.amount').text() * inputs.eq(i).val();
+                            if(i == 4 && iron){
+                                sum += (div.eq(i).find('span.amount').text() / 2) * 0.01;
+                            }
+                            sum = sum.toFixed(2);
+                            totalSum += +sum;
+                            div.eq(i).find('span.sum').text(sum);
+                        }
+                        
+                        totalSum = totalSum.toFixed(2);
+                        lastDiv.find('span').text(totalSum);
+
+                        if(iron){
+                            let charcoal = (Number(inputs.eq(4).val()) * 2 + 0.01) / (1.4 + fortValue);
+                            let tier2 = (inputs.eq(0).val() * 4 + 0.01) / (1.4 + fortValue);
+                            let tier3 = (tier2 * 3 + Number(inputs.eq(3).val()) + 0.02 + (charcoal * 2)) / (2.13 + fortValue);
+                            let tier4 = ((Number(inputs.eq(1).val()) * 6) + (tier3 * 2) + Number(inputs.eq(3).val()) + 0.02 + (charcoal * 2)) / (1.6 + fortValue);
+                            console.log(Number(inputs.eq(1).val()) * 6, (tier3 * 2), Number(inputs.eq(3).val()), (charcoal * 2));
+                            tiersWrap.find('span').eq(0).text(tier2.toFixed(3));
+                            tiersWrap.find('span').eq(1).text(tier3.toFixed(3));
+                            tiersWrap.find('span').eq(2).text(tier4.toFixed(2));
+                            tiersWrap.find('span').eq(3).text(charcoal.toFixed(3));
+                        }else if(wood){
+                            let tier2 = (inputs.eq(0).val() * 4 + 0.01) / (1.4 + fortValue);
+                            let tier3 = (tier2 * 2 + (Number(inputs.eq(1).val()) * 4) + Number(inputs.eq(4).val()) + 0.02) / (2.13 + fortValue);
+                            let tier4 = ((Number(inputs.eq(2).val()) * 6) + (tier3 * 2) + Number(inputs.eq(4).val()) + 0.02) / (1.6 + fortValue);
+                            tiersWrap.find('span').eq(0).text(tier2.toFixed(3));
+                            tiersWrap.find('span').eq(1).text(tier3.toFixed(3));
+                            tiersWrap.find('span').eq(2).text(tier4.toFixed(2));
+                        }else if(leather){
+                            let tier2 = (inputs.eq(0).val() * 4 + 0.01) / (1.4 + fortValue);
+                            let tier3 = (tier2 * 4 + Number(inputs.eq(3).val()) + 0.02) / (2.13 + fortValue);
+                            let tier4 = ((Number(inputs.eq(1).val()) * 6) + (tier3 * 2) + Number(inputs.eq(3).val()) + 0.02) / (1.6 + fortValue);
+                            tiersWrap.find('span').eq(0).text(tier2.toFixed(3));
+                            tiersWrap.find('span').eq(1).text(tier3.toFixed(3));
+                            tiersWrap.find('span').eq(2).text(tier4.toFixed(2));
+                        }else {
+                            let tier2 = (inputs.eq(0).val() * 4 + 0.01) / (1.4 + fortValue);
+                            let tier3 = (tier2 * 4 + Number(inputs.eq(3).val()) + 0.02) / (2.13 + fortValue);
+                            let tier4 = ((Number(inputs.eq(1).val()) * 6) + (tier3 * 2) + Number(inputs.eq(3).val()) + 0.02) / (1.6 + fortValue);
+                            tiersWrap.find('span').eq(0).text(tier2.toFixed(3));
+                            tiersWrap.find('span').eq(1).text(tier3.toFixed(3));
+                            tiersWrap.find('span').eq(2).text(tier4.toFixed(2));
+                        }
+                    });
+                }else{
+                    parent.find('.total').slideUp();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="calc leather">
+        <div class="title">Калькулятор крафта шкур</div>
+        <div class="calc_body">
+            <div class="col">
+                <div class="col_title">Rawhide:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Thick Hide:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Iron Hide:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Aged Tannin:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Форт ?</div>
+                <div class="col_body"><input type="checkbox"></div>
+            </div>
+        </div>
+        <div class="total">
+            <div class="title">Итого:</div>
+            <div class="total_rows">
+                <div><span class="amount">10092</span> Rawhide = <span class="sum"></span> gold</div>
+                <div><span class="amount">5640</span> Thick Hide = <span class="sum"></span> gold</div>
+                <div><span class="amount">6016</span> Iron Hide = <span class="sum"></span> gold</div>
+                <div><span class="amount">2575</span> Aged Tannin = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="total_rows">
+                <div><span class="amount">7892</span> Rawhide = <span class="sum"></span> gold</div>
+                <div><span class="amount">4944</span> Thick Hide = <span class="sum"></span> gold</div>
+                <div><span class="amount">5600</span> Iron Hide = <span class="sum"></span> gold</div>
+                <div><span class="amount">2264</span> Aged Tannin = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="tiers">
+                <div>Coarse Leather = <span>0</span> gold</div>
+                <div>Rugged Leather = <span>0</span> gold</div>
+                <div>Layered Leather = <span>0</span> gold</div>
+            </div>
+        </div>
+    </div>
+    <div class="calc">
+        <div class="title">Калькулятор крафта волокна</div>
+        <div class="calc_body">
+            <div class="col">
+                <div class="col_title">Fibers:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Silk Threads:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Wirefiber:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Wireweave:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Форт ?</div>
+                <div class="col_body"><input type="checkbox"></div>
+            </div>
+        </div>
+        <div class="total">
+            <div class="title">Итого:</div>
+            <div class="total_rows">
+                <div><span class="amount">10092</span> Fibers = <span class="sum"></span> gold</div>
+                <div><span class="amount">5640</span> Silk Threads = <span class="sum"></span> gold</div>
+                <div><span class="amount">6016</span> Wirefiber = <span class="sum"></span> gold</div>
+                <div><span class="amount">2575</span> Wireweave = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="total_rows">
+                <div><span class="amount">7892</span> Fibers = <span class="sum"></span> gold</div>
+                <div><span class="amount">4944</span> Silk Threads = <span class="sum"></span> gold</div>
+                <div><span class="amount">5600</span> Wirefiber = <span class="sum"></span> gold</div>
+                <div><span class="amount">2264</span> Wireweave = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="tiers">
+                <div>Linen = <span>0</span> gold</div>
+                <div>Sateen = <span>0</span> gold</div>
+                <div>Silk = <span>0</span> gold</div>
+            </div>
+        </div>
+    </div>
+    <div class="calc wood">
+        <div class="title">Калькулятор крафта дерева</div>
+        <div class="calc_body">
+            <div class="col">
+                <div class="col_title">Green Wood:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Aged Wood:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Wyrdwood:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Ironwood:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Obsidian Sandpaper:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Форт ?</div>
+                <div class="col_body"><input type="checkbox"></div>
+            </div>
+        </div>
+        <div class="total">
+            <div class="title">Итого:</div>
+            <div class="total_rows">
+                <div><span class="amount">5044</span> Green Wood = <span class="sum"></span> gold</div>
+                <div><span class="amount">3532</span> Aged Wood = <span class="sum"></span> gold</div>
+                <div><span class="amount">5640</span> Wyrdwood = <span class="sum"></span> gold</div>
+                <div><span class="amount">6016</span> Ironwood = <span class="sum"></span> gold</div>
+                <div><span class="amount">2575</span> Obsidian Sandpaper = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span>5000</span> gold</div>
+            </div>
+            <div class="total_rows">
+                <div><span class="amount">3948</span> Green Wood = <span class="sum"></span> gold</div>
+                <div><span class="amount">2960</span> Aged Wood = <span class="sum"></span> gold</div>
+                <div><span class="amount">4944</span> Wyrdwood = <span class="sum"></span> gold</div>
+                <div><span class="amount">5600</span> Ironwood = <span class="sum"></span> gold</div>
+                <div><span class="amount">1982</span> Obsidian Sandpaper = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span>5000</span> gold</div>
+            </div>
+            <div class="tiers">
+                <div>Timber = <span>0</span> gold</div>
+                <div>Lumber = <span>0</span> gold</div>
+                <div>Wyrdwood planks = <span>0</span> gold</div>
+            </div>
+        </div>
+    </div>
+    <div class="calc iron">
+        <div class="title">Калькулятор крафта железа</div>
+        <div class="calc_body">
+            <div class="col">
+                <div class="col_title">Iron ore:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Starmetal ore:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Orichalcum ore:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Obsidian flux:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Green Wood:</div>
+                <div class="col_body"><input type="number"></div>
+            </div>
+            <div class="col">
+                <div class="col_title">Форт ?</div>
+                <div class="col_body"><input type="checkbox"></div>
+            </div>
+        </div>
+        <div class="total">
+            <div class="title">Итого:</div>
+            <div class="total_rows">
+                <div><span class="amount">7568</span> Iron ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">5640</span> Starmetal ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">6016</span> Orichalcum ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">2575</span> Obsidian flux = <span class="sum"></span> gold</div>
+                <div><span class="amount">7356</span> Green Wood = 5150 Charcoal = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="total_rows">
+                <div><span class="amount">5920</span> Iron ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">4944</span> Starmetal ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">5600</span> Orichalcum ore = <span class="sum"></span> gold</div>
+                <div><span class="amount">2282</span> Obsidian flux = <span class="sum"></span> gold</div>
+                <div><span class="amount">6016</span> Green Wood = 4564 Charcoal = <span class="sum"></span> gold</div>
+                <div>Общая стоимость: <span></span> gold</div>
+            </div>
+            <div class="tiers">
+                <div>Iron Ingot = <span>0</span> gold</div>
+                <div>Steel Ingot = <span>0</span> gold</div>
+                <div>Starmetal Ingot = <span>0</span> gold</div>
+                <div>Charcoal = <span>0</span> gold</div>
+            </div>
+        </div>
+    </div>
+    <div class="new_calc">
+        <div class="new_title"></div>
+        <div class="new_body">
+            <div class="new_col">
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Dark Hide:</div>
+                    <input type="number" data-amount="16" class="rawres">
+                </div>
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Infused Leather:</div>
+                    <input type="number" data-amount="2" class="refres">
+                </div>
+                Форт ? <input type="checkbox">
+                <div class="result">Dark Leather: <span></span></div>
+            </div>
+            <div class="new_col">
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Spinfiber:</div>
+                    <input type="number" data-amount="12" class="rawres">
+                </div>
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Infused Silk:</div>
+                    <input type="number" data-amount="2" class="refres">
+                </div>
+                Форт ? <input type="checkbox">
+                <div class="result">Spinweave Cloth: <span></span></div>
+            </div>
+            <div class="new_col">
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Runewood:</div>
+                    <input type="number" data-amount="12" class="rawres">
+                </div>
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Ironwood Planks:</div>
+                    <input type="number" data-amount="2" class="refres">
+                </div>
+                Форт ? <input type="checkbox">
+                <div class="result">Runewood Planks: <span></span></div>
+            </div>
+            <div class="new_col">
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Mythril Ore:</div>
+                    <input type="number" data-amount="12" class="rawres">
+                </div>
+                <div class="new_col_input">
+                    <div class="new_col_input_title">Orichalcum Ingot:</div>
+                    <input type="number" data-amount="2" class="refres">
+                </div>
+                Форт ? <input type="checkbox">
+                <div class="result">Prismatic Ingot: <span></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="matrixcalc">
+        <div class="prismatic">
+            <div>
+                <div class="tit">Prismatic ingot</div>
+                <input type="number" class="pingot">
+            </div>
+            <div>
+                <div class="tit">Prismatic planks</div>
+                <input type="number" class="pplanks">
+            </div>
+            <div>
+                <div class="tit">Prismatic leather</div>
+                <input type="number" class="pleather">
+            </div>
+            <div>
+                <div class="tit">Prismatic cloth</div>
+                <input type="number" class="pcloth">
+            </div>
+            <div>
+                <div class="tit">Prismatic block</div>
+                <input type="number" class="pblock">
+            </div>
+            <div>
+                <div class="tit">Suspended Azoth</div>
+                <input type="number" class="sus">
+            </div>
+            <div>
+                <div class="tit">Infused Alkahest</div>
+                <input type="number" class="alk">
+            </div>
+            <div>
+                <div class="tit">Powerful Gemstone Dust</div>
+                <input type="number" class="gem">
+            </div>
+        </div>
+        <div class="tcosts">
+            <div>
+                Enchanted Handle(Outfitting)
+                <span></span>
+            </div>
+            <div>
+                Blessed Rivets(Stonecutting)
+                <span></span>
+            </div>
+            <div>
+                Honing Acid(Arcane) с учётом прока
+                <span></span>
+            </div>
+            <div>
+                Reinforced Bracing(Workshop)
+                <span></span>
+            </div>
+            <div>
+                Tempered Cast(Forge)
+                <span></span>
+            </div>
+            <div>
+                Armor Matrix(Outfitting)
+                <span></span>
+            </div>
+            <div>
+                Armor Matrix(Arcane) с учётом прока
+                <span></span>
+            </div>
+            <div>
+                Weapon Matrix(Forge)
+                <span></span>
+            </div>
+            <div>
+                Weapon Matrix(Workshop)
+                <span></span>
+            </div>
+            <div>
+                Jewelry Matrix(Forge)
+                <span></span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
